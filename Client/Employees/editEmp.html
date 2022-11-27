@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="../credit.js"> </script>
+    <link rel="stylesheet" href="../Css Styles/header.css">
+    <title>Edit Employee</title>
+  </head>
+  <script>
+let employeeId;
+    async function loadData() {
+      document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+   userId =  sessionStorage["userId"];
+      let params = new URLSearchParams(window.location.search);
+       employeeId = params.get("employeeId");
+
+      let respond = await fetch(
+        "https://localhost:44339/api/EmployeeFullData/" + employeeId
+      );
+      let status = await respond.json();
+
+      document.getElementById("fname").value = status.FirstName;
+      document.getElementById("lname").value = status.LastName;
+      document.getElementById("hireDate").value = status.HireDate.slice(0,10);
+      document.getElementById("contact").value = status.Contact;
+
+      let resp = await fetch("https://localhost:44339/api/department");
+      let depResp = await resp.json();
+
+      let selectObj = document.getElementById("dep");
+      depResp.forEach((x) => {
+        let optionObj = document.createElement("option");
+        optionObj.innerText = x.DepName;
+        optionObj.value = x.Id;
+        selectObj.appendChild(optionObj);
+      });
+    }
+    async function editEmp() {
+      creditUser()
+      let obj = {
+        FirstName: document.getElementById("fname").value,
+        LastName: document.getElementById("lname").value,
+        HireDate: document.getElementById("hireDate").value,
+        DepID: parseInt(document.getElementById("dep").value),
+        Contact: document.getElementById("contact").value,
+      };
+
+      let fetchParams = {
+        method: "PUT",
+        body: JSON.stringify(obj),
+        headers: { "Content-Type": "application/json" },
+      };
+
+      let resp = await fetch( "https://localhost:44339/api/Employee/" + employeeId,
+        fetchParams
+      );
+      let status = await resp.json();
+      alert(status);
+    }
+  </script>
+  <body onload="loadData()">
+    <div id="page-wrapper">
+      <header id="header">
+        <div class="logo">
+          <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+        </div>
+        <nav id="nav-bar">
+          <ul>
+            <li id="userFullName"></li>
+            <li id="userActions"></li>
+            <li><a href="./LogIn.html">Logout</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+    <h2>Edit Employee</h2>
+    <br />
+    <div class="form-group">
+      <label for="fname">First name:</label>
+      <input type="text" class="form-control" id="fname" autocomplete="off" />
+    </div>
+    <br />
+    <div class="form-group">
+      <label for="lname">Last name:</label>
+      <input type="text" class="form-control" id="lname" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label for="hireDate">Hire Date:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="hireDate"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="contact">Contact:</label>
+      <input type="text" class="form-control" id="contact" autocomplete="off" />
+    </div>
+
+    <div class="form-group">
+      <label for="dep">Department:</label>
+      <select id="dep"></select>
+    </div>
+
+    <button type="input" class="btn btn-primary" onclick="editEmp()">
+      Save
+    </button>
+    <br />
+    <button
+      type="input"
+      class="btn btn-primary"
+      onclick="location.href ='Employee.html';"
+    >
+      Back To Employee Page
+    </button>
+  </body>
+</html>

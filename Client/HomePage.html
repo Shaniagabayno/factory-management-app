@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Page</title>
+  <link rel="stylesheet" href="./Css Styles/Homepage.css">
+  <link rel="stylesheet" href="./Css Styles/header.css">
+  <script type="text/javascript" src="./credit.js"></script>
+</head>
+<script>
+  function loadHomePage() {
+    creditUser()
+    document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+      
+    creditUser();
+  }
+</script>
+
+<body onload="loadHomePage();">
+  <div id="page-wrapper">
+    <header id="header">
+      <div class="logo">
+        <img id="header-img" src="./Css Styles/logo.jpg" alt="logo">
+      </div>
+      <nav id="nav-bar">
+        <ul>
+          <li id="userFullName"></li>
+          <li id="userActions"></li>
+          <li><a href="./LogIn.html">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+  <div class="container">
+    <div class="card">
+      <figure class="card__thumb">
+        <img src="./Css Styles/shift.png" alt="Shift Schedule" height="420px" width="380px" class="card__image">
+        <figcaption class="card__caption">
+          <h2 class="card__title">Shifts Category</h2>
+          <br>
+          <p class="card__snippet">Here you will find the departments of the employees </p>
+          <a href="./Shifts/shift.html" class="card__button">Visit</a>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="card">
+      <figure class="card__thumb">
+        <img src="./Css Styles/employee.jpg" height="420px" width="380px" alt="Worker" class="card__image">
+        <figcaption class="card__caption">
+          <h2 class="card__title">Employee Category</h2>
+          <br>
+          <p class="card__snippet"> Here you can find the data of all employees</p>
+          <a href="./Employees/Employee.html" class="card__button">Visit </a>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="card">
+      <figure class="card__thumb">
+        <img src="./Css Styles/department.jpg" height="420px" width="380px" alt="Cutting Picture" class="card__image">
+        <figcaption class="card__caption">
+          <h2 class="card__title">Department Category</h2>
+          <br>
+          <p class="card__snippet">Need to check employees departments ? Just click on the button below</p>
+          <a href="./Departments/Department.html" class="card__button">Visit </a>
+        </figcaption>
+      </figure>
+    </div>
+
+  </div>
+</body>
+
+</html>

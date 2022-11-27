@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shifts</title>
+    <script type="text/javascript" src="../credit.js"> </script>
+    <link rel="stylesheet" href="../Css Styles/header.css">
+  </head>
+  <script>
+    async function GetShifts() {
+      document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+      creditUser()
+      let resp = await fetch("https://localhost:44339/api/shifts");
+      let shifts = await resp.json();
+
+      let respond = await fetch("https://localhost:44339/api/EmployeeFullData");
+      let emp = await respond.json();
+
+      let req = await fetch("https://localhost:44339/api/EmployeeShift");
+      let empS = await req.json();
+
+      let body = document.getElementById("tBody");
+
+      shifts.forEach((element) => {
+        let tdDate = document.createElement("td");
+        tdDate.innerText = element.Date.slice(0, 10);
+
+        let tdStart = document.createElement("td");
+        tdStart.innerText = element.StartTime;
+
+        let tdEnd = document.createElement("td");
+        tdEnd.innerText = element.EndTime;
+
+        let trObj = document.createElement("tr");
+        trObj.appendChild(tdDate);
+        trObj.appendChild(tdStart);
+        trObj.appendChild(tdEnd);
+
+        let tdEmpName = document.createElement("td");
+        emp.forEach((e) => {
+          e.Shifts.forEach((empShift) => {
+            if (empShift.ID == element.ID) {
+              let empNameLink = document.createElement("a");
+              empNameLink.innerText = `${e.FirstName}  ${e.LastName}      `;
+              empNameLink.href = "../Employees/editEmp.html?employeeId" + e.Id;
+              empNameLink.style.color = "black";
+              empNameLink.style.textDecoration = "none";
+
+              tdEmpName.appendChild(empNameLink);
+            }
+          });
+          trObj.appendChild(tdEmpName);
+        });
+        body.appendChild(trObj);
+      });
+    }
+  </script>
+  <body onload="GetShifts()">
+    <div id="page-wrapper">
+      <header id="header">
+        <div class="logo">
+          <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+        </div>
+        <nav id="nav-bar">
+          <ul>
+            <li id="userFullName"></li>
+            <li id="userActions"></li>
+            <li><a href="./LogIn.html">Logout</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+    <h2>Shifts Schedule</h2>
+    <input
+      type="button"
+      value="Add Shift"
+      onclick="location.href='./addShift.html';"
+    />
+    <br />
+    <table class="table table-hover" border="1">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Start shift</th>
+          <th scope="col">End shift</th>
+          <th scope="col">Employees registered</th>
+        </tr>
+      </thead>
+      <tbody id="tBody"></tbody>
+    </table>
+    <br />
+    <br />
+    <br />
+    <input
+      type="button"
+      value="Back To Home Page"
+      onclick="location.href='../HomePage.html';"
+    />
+    <input
+      type="button"
+      value="Log out"
+      onclick="location.href='../LogIn.html';"
+    />
+  </body>
+</html>

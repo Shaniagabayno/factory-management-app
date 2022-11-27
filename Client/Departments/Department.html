@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="../credit.js"> </script>
+    <link rel="stylesheet" href="../Css Styles/header.css">
+    <title>Department</title>
+  </head>
+  <script>
+    async function GetDep() {
+      document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+      creditUser()
+      let resp = await fetch("https://localhost:44339/api/department");
+      let dep = await resp.json();
+
+      let respond = await fetch("https://localhost:44339/api/EmployeeFullData");
+      let empData = await respond.json();
+
+      let body = document.getElementById("tBody");
+
+      dep.forEach((element) => {
+        let depId = document.createElement("td");
+        depId.innerText = element.Id;
+        depId.style.visibility = "hide";
+
+        let depTD = document.createElement("td");
+        depTD.innerText = element.DepName;
+
+        let ManagerTD = document.createElement("td");
+        empData.forEach((emp) => {
+          if (emp.Id == element.Manager) {
+            ManagerTD.value = element.Manager;
+            ManagerTD.innerText = ` ${emp.FirstName}  ${emp.LastName}`;
+          }
+        });
+
+        let Editbtn = document.createElement("input");
+        Editbtn.type = "button";
+        Editbtn.value = "Edit";
+        Editbtn.onclick = () => {
+          location.href = "editDep.html?departmentId=" + element.Id;
+        };
+
+        let trObj = document.createElement("tr");
+
+        trObj.appendChild(depTD);
+        trObj.appendChild(ManagerTD);
+        trObj.appendChild(Editbtn);
+
+        let depEmptyOrNot = false;
+        empData.forEach((x) => {
+          if (x.DepID == element.Id) {
+            depEmptyOrNot = true;
+          }
+        });
+        if (depEmptyOrNot == false) {
+          let Deletebtn = document.createElement("input");
+          Deletebtn.type = "button";
+          Deletebtn.value = "Delete";
+          Deletebtn.onclick = () => {
+            deleteDep(element.Id);
+          };
+          trObj.appendChild(Deletebtn);
+        }
+        body.appendChild(trObj);
+      });
+    }
+
+    async function deleteDep(Id) {
+      creditUser()
+      let fetchParams = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      };
+
+      let resp = await fetch(
+        "https://localhost:44339/api/department/" + Id,
+        fetchParams
+      );
+
+      let status = await resp.json();
+      alert(status);
+    }
+
+    function NewDep() {
+      location.href = "addDep.html";
+    }
+    function LinkToLogIN() {
+      location.href = "../LogIn.html";
+    }
+    function homePage() {
+      location.href = "../HomePage.html";
+    }
+  </script>
+  <body onload="GetDep()">
+    <div id="page-wrapper">
+      <header id="header">
+        <div class="logo">
+          <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+        </div>
+        <nav id="nav-bar">
+          <ul>
+            <li id="userFullName"></li>
+            <li id="userActions"></li>
+            <li><a href="./LogIn.html">Logout</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+    <div class="container">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        onclick="NewDep()"
+      >
+        Create New Department
+      </button>
+
+      <br />
+      <br />
+
+      <table class="table table-hover" border="1">
+        <thead>
+          <tr>
+            <th scope="col">Department</th>
+            <th scope="col">Manager Name</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+    <br />
+    <br />
+    <br />
+    <input type="button" value="Back To Home Page" onclick="homePage()" />
+    <input type="button" value="Log out" onclick="LinkToLogIN()" />
+  </body>
+</html>

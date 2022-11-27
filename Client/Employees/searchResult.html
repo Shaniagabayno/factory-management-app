@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="text/javascript" src="../credit.js"> </script>
+  <link rel="stylesheet" href="../Css Styles/header.css">
+  <title>Search Results</title>
+</head>
+<script>
+
+  async function searchResult() {
+    document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+    creditUser()
+    let urlParams = new URLSearchParams(window.location.search);
+    let  text= urlParams.get("text");
+
+    let resp = await fetch("https://localhost:44339/api/EmployeeFullData?text=" + text);
+    let empData = await resp.json();
+    let body = document.getElementById("tBody");
+
+    empData.forEach(element => {
+      let tdFirstName = document.createElement("td");
+      tdFirstName.innerText = element.FirstName;
+
+      let tdLastName = document.createElement("td");
+      tdLastName.innerText = element.LastName;
+
+      let tdHireDate = document.createElement("td");
+      let pObj = document.createElement("p");
+      let date = new Date(element.HireDate);
+      let text = date.toDateString().split(" ").slice(1).join(" ");
+      pObj.innerHTML = text;
+      tdHireDate.appendChild(pObj);
+
+      let tdContact = document.createElement("td");
+      tdContact.innerText = element.Contact;
+
+      let tdDepartment = document.createElement("td");
+      tdDepartment.innerText = element.DepName;
+
+      let tdShift = document.createElement("td");
+      let listShift = document.createElement("ul");
+      if (element.Shifts.length > 0) {
+        element.Shifts.forEach((x) => {
+          let liDate = document.createElement("li");
+          liDate.innerText = x.Date.slice(0, 10);
+
+          let liShiftStart = document.createElement("li");
+          liShiftStart.innerText = `Start Shift: ${x.StartTime}`;
+          liShiftStart.style.listStyleType = "none";
+
+          let liShiftEnd = document.createElement("li");
+          liShiftEnd.innerText = `End Shift: ${x.EndTime}`;
+          liShiftEnd.style.listStyleType = "none";
+
+          listShift.appendChild(liDate);
+          listShift.appendChild(liShiftStart);
+          listShift.appendChild(liShiftEnd);
+          tdShift.appendChild(listShift);
+        });
+      } else {
+        listShift.innerText = `${element.FirstName}  ${element.LastName} has no shift today!`;
+      }
+      let tdObj = document.createElement("td");
+      let Editbtn = document.createElement("input");
+      Editbtn.type = "button";
+      Editbtn.value = "Edit";
+      Editbtn.onclick = () => {
+        location.href = "editEmp.html?employeeId=" + element.Id;
+      };
+      let Deletebtn = document.createElement("input");
+      Deletebtn.type = "button";
+      Deletebtn.value = "Delete Emp";
+      Deletebtn.className = "Deletebtn";
+      Deletebtn.onclick = () => {
+        deleteEmpShift(element.Id);
+      };
+      let Addbtn = document.createElement("input");
+      Addbtn.type = "button";
+      Addbtn.value = "Add Shift";
+      Addbtn.onclick = () => {
+        location.href = "addShiftEmp.html?employeeId=" + element.Id;
+      };
+      tdObj.appendChild(Editbtn);
+      tdObj.appendChild(Deletebtn);
+      tdObj.appendChild(Addbtn);
+
+      let trObj = document.createElement("tr");
+      trObj.appendChild(tdFirstName);
+      trObj.appendChild(tdLastName);
+      trObj.appendChild(tdHireDate);
+      trObj.appendChild(tdContact);
+      trObj.appendChild(tdDepartment);
+      trObj.appendChild(tdShift);
+      trObj.appendChild(tdObj);
+
+      body.appendChild(trObj);
+    });
+  }
+</script>
+
+<body onload="searchResult()">
+  <div id="page-wrapper">
+    <header id="header">
+      <div class="logo">
+        <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+      </div>
+      <nav id="nav-bar">
+        <ul>
+          <li id="userFullName"></li>
+          <li id="userActions"></li>
+          <li><a href="./LogIn.html">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+  <h2>Search Result</h2>
+  <table class="table table-hover" border="1" id="tbl">
+    <thead>
+      <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Hire Date</th>
+        <th scope="col">Contact</th>
+        <th scope="col">Department</th>
+        <th scope="col">Shifts</th>
+      </tr>
+    </thead>
+    <tbody id="tBody"></tbody>
+  </table>
+  <br />
+  <button type="input" class="btn btn-primary" onclick="location.href ='Employee.html';">
+    Back To Employee Page
+  </button>
+</body>
+
+</html>

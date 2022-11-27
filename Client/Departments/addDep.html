@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="../credit.js"> </script>
+    <link rel="stylesheet" href="../Css Styles/header.css">
+    <title>Add Department</title>
+  </head>
+  <script>
+    async function loadData() {
+      document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+      let resp = await fetch("https://localhost:44339/api/department");
+      let dep = await resp.json();
+
+      let respond = await fetch("https://localhost:44339/api/Employee");
+      let empData = await respond.json();
+
+      let selectObj = document.getElementById("selectManager");
+
+      dep.forEach((x) => {
+        empData.forEach((emp) => {
+          if (emp.Id == x.Manager) {
+            let optionObj = document.createElement("option");
+            optionObj.value = x.Manager;
+            optionObj.innerText = `  ${emp.FirstName}  ${emp.LastName}`;
+            selectObj.appendChild(optionObj);
+          }
+        });
+      });
+    }
+    async function save() {
+      creditUser()
+      let obj = {
+        DepName: document.getElementById("dep").value,
+        Manager: document.getElementById("selectManager").value,
+      };
+
+      let fetchParams = {
+        method: "POST",
+        body: JSON.stringify(obj),
+        headers: { "Content-Type": "application/json" },
+      };
+
+      let resp = await fetch(
+        "https://localhost:44339/api/department",
+        fetchParams
+      );
+      let dep = await resp.json();
+      alert(dep);
+    }
+    function backToList() {
+      location.href = "Department.html";
+    }
+  </script>
+  <body onload="loadData()">
+    <div id="page-wrapper">
+      <header id="header">
+        <div class="logo">
+          <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+        </div>
+        <nav id="nav-bar">
+          <ul>
+            <li id="userFullName"></li>
+            <li id="userActions"></li>
+            <li><a href="./LogIn.html">Logout</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+    <h2>Add Department</h2>
+    <br />
+    <div class="form-group">
+      <label for="dep">Department:</label>
+      <input type="text" class="form-control" id="dep" autocomplete="off" />
+    </div>
+
+    <div class="form-group">
+      <label for="manager">Manager:</label>
+      <select id="selectManager">
+        <option value="">Select Manager</option>
+      </select>
+    </div>
+
+    <button type="input" class="btn btn-primary" onclick="save()">Save</button>
+    <br />
+    <button type="input" class="btn btn-primary" onclick="backToList()">
+      Back To Department
+    </button>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <link rel="stylesheet" href="./Css Styles/LogIn.css" />
+  </head>
+  <script>
+    async function Login() {
+      let userInput = document.getElementById("Username").value;
+      let password = document.getElementById("PassTxt").value;
+
+      let resp = await fetch(
+        "https://localhost:44339/api/User?" +
+          new URLSearchParams({
+            userName: userInput,
+            Password: password,
+          })
+      );
+      let user = await resp.json();
+      if (user == null) {
+        alert("Username not exist");
+      } else {
+        sessionStorage["userFullName"] = user.FullName;
+        sessionStorage["userId"] = user.Id;
+        sessionStorage["maxActions"] = user.MaxActions;
+        sessionStorage["TotalActionsToday"] = user.TotalActionsToday;
+        sessionStorage["currentDate"] = new Date().toString().slice(0, 10);
+        document.location.href = "./HomePage.html";
+      }
+    }
+
+    function showPass() {
+      var p = document.getElementById("PassTxt");
+      if (p.type === "password") {
+        p.type = "text";
+      } else {
+        p.type = "password";
+      }
+    }
+  </script>
+
+  <body>
+    <div class="container">
+      <div class="top"></div>
+      <div class="bottom"></div>
+      <div class="center">
+        <h2>Log In</h2>
+        <input
+          type="text"
+          id="Username"
+          placeholder="Username"
+          required
+          autocomplete="off"
+        />
+        <br />
+        <input type="password" id="PassTxt" placeholder="Password" required />
+        <br />
+        <span id="msg"></span>
+        Show Password: <input type="checkbox" onclick="showPass()" />
+        <br />
+        <input type="submit" value="LOGIN" onclick="Login()" />
+        <h2>&nbsp;</h2>
+      </div>
+    </div>
+  </body>
+</html>

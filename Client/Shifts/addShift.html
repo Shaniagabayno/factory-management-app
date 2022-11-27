@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Shift</title>
+    <script type="text/javascript" src="../credit.js"> </script>
+    <link rel="stylesheet" href="../Css Styles/header.css">
+  </head>
+  <script>
+    async function loadData() {
+      document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+      let resp = await fetch("https://localhost:44339/api/Shifts");
+      let data = await resp.json();
+
+      let shiftStart = document.getElementById("startShift");
+      let shiftEnd = document.getElementById("endShift");
+      data.forEach((element) => {
+        let optionObj = document.createElement("option");
+        optionObj.value = element.StartTime;
+        optionObj.innerText = element.StartTime;
+
+        let optionEnd = document.createElement("option");
+        optionEnd.value = element.EndTime;
+        optionEnd.innerText = element.EndTime;
+        shiftStart.appendChild(optionObj);
+        shiftEnd.appendChild(optionEnd);
+      });
+    }
+
+    async function addShift() {
+      creditUser()
+      let obj = {
+        Date: document.getElementById("date").value,
+        StartTime: document.getElementById("startShift").value,
+        EndTime: document.getElementById("endShift").value,
+      };
+
+      let fetchParams = {
+        method: "POST",
+        body: JSON.stringify(obj),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      let resp = await fetch("https://localhost:44339/api/Shifts", fetchParams);
+      let status = await resp.json();
+      alert(status);
+    }
+  </script>
+
+  <body onload="loadData()">
+    <div id="page-wrapper">
+      <header id="header">
+        <div class="logo">
+          <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+        </div>
+        <nav id="nav-bar">
+          <ul>
+            <li id="userFullName"></li>
+            <li id="userActions"></li>
+            <li><a href="./LogIn.html">Logout</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+    <h1>Add Shift</h1>
+    <div class="form-group">
+      <label for="shift">Shift Date:</label>
+      <input type="date" class="form-control" id="date" autocomplete="off" />
+    </div>
+    <br />
+    <div class="form-group">
+      <label for="startShift">Choose Shift Start Time</label>
+      <select id="startShift"></select>
+      <label for="EndShift">Choose Shift End Time</label>
+      <select id="endShift"></select>
+    </div>
+    <br />
+    <button type="input" class="btn btn-primary" onclick="addShift()">
+      Save
+    </button>
+
+    <input
+      type="button"
+      value="Back To Shifts Schedule"
+      onclick="location.href='./shift.html';"
+    />
+  </body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="text/javascript" src="../credit.js"> </script>
+  <link rel="stylesheet" href="../Css Styles/header.css">
+  <title>Add Shift To Employee</title>
+</head>
+<script>
+
+  let params = new URLSearchParams(window.location.search);
+ let  employeeId = params.get("employeeId");
+
+  async function loadData() {
+    document.getElementById("userFullName").innerText = ` Welcome ${sessionStorage["userFullName"]}`;
+    document.getElementById("userActions").innerText =
+      `You have ${ sessionStorage["TotalActionsToday"]}/${ sessionStorage["maxActions"]} actions for today`;
+    let respond = await fetch("https://localhost:44339/api/EmployeeFullData/"+employeeId );
+    let Employee = await respond.json();
+
+    document.getElementById("fullName").innerText = `${Employee.FirstName}  ${Employee.LastName} `;
+
+    let resp = await fetch("https://localhost:44339/api/Shifts");
+    let data = await resp.json();
+
+    let selectOption = document.getElementById("shiftSelect");
+
+    data.forEach((element) => {
+      let option = document.createElement("option");
+      option.innerText = `${element.Date.slice(0, 10)}  ${element.StartTime} ${element.EndTime}`;
+      option.value = element.ID;
+      selectOption.appendChild(option);
+    });
+  }
+
+  async function addShift() {
+    creditUser()
+    let obj = {
+      EmpID: parseInt(employeeId),
+      ShiftID: parseInt(document.getElementById("shiftSelect").value),
+    };
+
+    let fetchParams = {
+      method: "POST",
+      body: JSON.stringify(obj),
+      headers: { "Content-Type": "application/json" },
+    };
+
+    let resp = await fetch( "https://localhost:44339/api/EmployeeShift", fetchParams );
+    let status = await resp.json();
+    alert(status);
+  }
+</script>
+
+<body onload="loadData()">
+  <div id="page-wrapper">
+    <header id="header">
+      <div class="logo">
+        <img id="header-img" src="../Css Styles/logo.jpg" alt="logo">
+      </div>
+      <nav id="nav-bar">
+        <ul>
+          <li id="userFullName"></li>
+          <li id="userActions"></li>
+          <li><a href="./LogIn.html">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+  <h1>Add Shift To Employee</h1>
+  <h2 id=fullName></h2>
+
+  <div class="form-group">
+    <label for="shift">Select Shift:</label>
+    <select id="shiftSelect"></select>
+  </div>
+  <br />
+
+  <input type="button" value="Save" onclick="addShift()" />
+  <button type="input" class="btn btn-primary" onclick="location.href='./Employee.html';">
+    Back To Employee Page
+  </button>
+</body>
+
+</html>
